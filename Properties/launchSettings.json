@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MyCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "complete --word-to-complete \"C#\" --input \"mycli google -q \"\"C# 入門\"\"\" --cursor-position 20"
+    }
+  }
+}
