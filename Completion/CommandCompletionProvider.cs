@@ -15,13 +15,13 @@ class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
         return GetEnumerator();
     }
 
-    public async Task<IEnumerable<string>> GetCompletionItemsAsync(string wordToComplete, string input, int cursorPosition)
+    public IEnumerable<string> GetCompletionItems(string wordToComplete, string input, int cursorPosition)
     {
         var tokens = Parse(input, cursorPosition).Skip(1).ToArray();
-        return await GetCompletionItemsAsync(tokens, wordToComplete);
+        return GetCompletionItems(tokens, wordToComplete);
     }
 
-    private async Task<IEnumerable<string>> GetCompletionItemsAsync(string[] tokens, string wordToComplete)
+    private IEnumerable<string> GetCompletionItems(string[] tokens, string wordToComplete)
     {
         //コマンド入力なし
         if (tokens.Length == 0)
@@ -47,7 +47,7 @@ class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
         if (op1 != null)
         {
             //オプションに対する入力候補を取得
-            return await GetCompletionItemByOptionName(cmd, op1, tokens, options, wordToComplete);
+            return GetCompletionItemByOptionName(cmd, op1, tokens, options, wordToComplete);
         }
 
         var op2 = options.FirstOrDefault(o => o == tokens[^2]);
@@ -55,17 +55,17 @@ class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
         if (op2 != null && wordToComplete != "")
         {
             //オプションに対する入力候補を取得
-            return await GetCompletionItemByOptionName(cmd, op2, tokens, options, wordToComplete);
+            return GetCompletionItemByOptionName(cmd, op2, tokens, options, wordToComplete);
         }
         
         return GetOptionNames(wordToComplete, options.Where(o=>!tokens.Contains(o)).ToArray());
     }
 
-    private static async Task<IEnumerable<string>> GetCompletionItemByOptionName(
+    private static IEnumerable<string> GetCompletionItemByOptionName(
         ICommandCompletionItem cmd, string optionName, string[] tokens, string[] options, string wordToComplete)
     {
         //オプションに対する入力候補を取得
-        var item = await cmd.GetCompletionItemsAsync(optionName, wordToComplete);
+        var item = cmd.GetCompletionItems(optionName, wordToComplete);
         if (!item.Any())
         {
             //値の候補なしの場合オプションを候補として出す

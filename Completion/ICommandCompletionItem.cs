@@ -3,5 +3,5 @@
     string CommandName { get; }
     
     IEnumerable<string> GetOptions();
-    Task<IEnumerable<string>> GetCompletionItemsAsync(string optionName, string wordToComplete);
+    IEnumerable<string> GetCompletionItems(string optionName, string wordToComplete);
 }
