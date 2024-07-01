@@ -15,27 +15,27 @@ partial class MyCommands
             [
                 new CommandCompletionItem("search")
                 {
-                    {"--category", ()=> ["books","movies","music"]},
-                    {"--sort", ()=> ["relevance","date","popularity"]},
-                    {"--filter", ()=> ["free","paid","all"]}
+                    {"--category", ["books","movies","music"]},
+                    {"--sort", ["relevance","date","popularity"]},
+                    {"--filter", ["free","paid","all"]}
                 },
                 new CommandCompletionItem("share")
                 {
-                    {"--platform", ()=> ["facebook","twitter","linkedin"]},
-                    {"--visibility", ()=> ["public","private","friends"]},
-                    {"--tag", ()=> ["fun","education","promotion"]}
+                    {"--platform", ["facebook","twitter","linkedin"]},
+                    {"--visibility", ["public","private","friends"]},
+                    {"--tag", ["fun","education","promotion"]}
                 },
                 new CommandCompletionItem("edit")
                 {
-                    {"--file", ()=> ["document1","document2","document3"]},
-                    {"--mode", ()=> ["read","write","append"]},
-                    {"--backup", ()=> []}
+                    {"--file", ["document1","document2","document3"]},
+                    {"--mode", ["read","write","append"]},
+                    {"--backup", []}
                 },
                 new CommandCompletionItem("view")
                 {
-                    {"--layout", ()=> ["grid","list","detail"]},
-                    {"--sort", ()=> ["name","date","size"]},
-                    {"--filter", ()=> ["all","folders","files"]}
+                    {"--layout", ["grid","list","detail"]},
+                    {"--sort", ["name","date","size"]},
+                    {"--filter", ["all","folders","files"]}
                 },
             ];
     }
