@@ -16,35 +16,32 @@ partial class MyCommands
 
     public MyCommands(HttpClient httpClient)
     {
-        static Task<IEnumerable<string>> TaskResult(IEnumerable<string> result)
-            => Task.FromResult(result);
-
         CompletionProvider =
             [
                 new GoogleCompletionItem(httpClient),
                 new CommandCompletionItem("search")
                 {
-                    {"--category", ()=> TaskResult(["books","movies","music"])},
-                    {"--sort", ()=> TaskResult(["relevance","date","popularity"])},
-                    {"--filter", ()=> TaskResult(["free","paid","all"])}
+                    {"--category", ["books","movies","music"]},
+                    {"--sort", ["relevance","date","popularity"]},
+                    {"--filter", ["free","paid","all"]}
                 },
                 new CommandCompletionItem("share")
                 {
-                    {"--platform", ()=> TaskResult(["facebook","twitter","linkedin"])},
-                    {"--visibility", ()=> TaskResult(["public","private","friends"])},
-                    {"--tag", ()=> TaskResult(["fun","education","promotion"])}
+                    {"--platform", ["facebook","twitter","linkedin"]},
+                    {"--visibility", ["public","private","friends"]},
+                    {"--tag", ["fun","education","promotion"]}
                 },
                 new CommandCompletionItem("edit")
                 {
-                    {"--file", ()=> TaskResult(["document1","document2","document3"])},
-                    {"--mode", ()=> TaskResult(["read","write","append"])},
-                    {"--backup", ()=> TaskResult([])}
+                    {"--file", ["document1","document2","document3"]},
+                    {"--mode", ["read","write","append"]},
+                    {"--backup", []}
                 },
                 new CommandCompletionItem("view")
                 {
-                    {"--layout", ()=> TaskResult(["grid","list","detail"])},
-                    {"--sort", ()=> TaskResult(["name","date","size"])},
-                    {"--filter", ()=> TaskResult(["all","folders","files"])}
+                    {"--layout", ["grid","list","detail"]},
+                    {"--sort", ["name","date","size"]},
+                    {"--filter", ["all","folders","files"]}
                 },
             ];
 
