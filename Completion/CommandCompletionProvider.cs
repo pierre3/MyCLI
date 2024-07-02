@@ -15,7 +15,7 @@ class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
         return GetEnumerator();
     }
 
-    public IEnumerable<string> GetCompletionItems(string wordToComplete, string input, int cursorPosition)
+    public IEnumerable<string> Complete(string wordToComplete, string input, int cursorPosition)
     {
         var tokens = Parse(input, cursorPosition).Skip(1).ToArray();
         return GetCompletionItems(tokens, wordToComplete);

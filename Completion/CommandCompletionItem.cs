@@ -1,6 +1,6 @@
 using System.Collections;
 
-class CommandCompletionItem(string commandName) : ICommandCompletionItem, IEnumerable<KeyValuePair<string, IEnumerable<string>>>
+class CommandCompletionItem(string commandName) : ICommandCompletionItem, IEnumerable
 {
     private readonly Dictionary<string, IEnumerable<string>> items = new();
 
@@ -12,13 +12,5 @@ class CommandCompletionItem(string commandName) : ICommandCompletionItem, IEnume
 
     public void Add(string key, IEnumerable<string> value) => items.Add(key, value);
 
-    public IEnumerator<KeyValuePair<string, IEnumerable<string>>> GetEnumerator()
-    {
-        return ((IEnumerable<KeyValuePair<string, IEnumerable<string>>>)items).GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
 }

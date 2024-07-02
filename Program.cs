@@ -43,7 +43,7 @@ partial class MyCommands
     public void Complete(string wordToComplete, string input, int cursorPosition)
     {
         var items = CompletionProvider
-            .GetCompletionItems(wordToComplete, input, cursorPosition);
+            .Complete(wordToComplete, input, cursorPosition);
         foreach (var item in items)
         {
             Console.WriteLine(item);
