@@ -1,19 +1,10 @@
 ﻿using System.Collections;
 
-class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
+class CommandCompletionProvider : ICommandCompletionProvider, IEnumerable
 {
-    public IList<ICommandCompletionItem> Items { get; } = [];
-    public void Add(ICommandCompletionItem item) => Items.Add(item);
-
-    public IEnumerator<ICommandCompletionItem> GetEnumerator()
-    {
-        return Items.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+    private readonly IList<ICommandCompletionItem> _items = [];
+    public void Add(ICommandCompletionItem item) => _items.Add(item);
+    IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
 
     public IEnumerable<string> Complete(string wordToComplete, string input, int cursorPosition)
     {
@@ -29,36 +20,36 @@ class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
             return GetCommandNames("");
         }
         //最初の要素がコマンド名
-        var cmd = Items.FirstOrDefault(x => tokens[0] == x.CommandName);
+        var cmd = _items.FirstOrDefault(x => tokens[0] == x.CommandName);
         if (cmd == null)
         {
             //コマンド未入力 or 入力途中の場合、コマンド名一覧を表示
             return GetCommandNames(wordToComplete);
         }
         //入力中のコマンドからオプション一覧を取得
-        var options = cmd.GetOptions().ToArray();
-        if(tokens.Length == 1) //コマンドのみ指定済み
+        var allOptions = cmd.GetAllOptions().ToArray();
+        if (tokens.Length == 1) //コマンドのみ指定済み
         {
-            return GetOptionNames(wordToComplete, options);
+            return cmd.GetOptions(wordToComplete);
         }
-        
-        var op1 = options.FirstOrDefault(o => o == tokens[^1]);
+
+        var op1 = allOptions.FirstOrDefault(o => o == tokens[^1]);
         //最後の入力値がオプションと一致
         if (op1 != null)
         {
             //オプションに対する入力候補を取得
-            return GetCompletionItemByOptionName(cmd, op1, tokens, options, wordToComplete);
+            return GetCompletionItemByOptionName(cmd, op1, tokens, allOptions, wordToComplete);
         }
 
-        var op2 = options.FirstOrDefault(o => o == tokens[^2]);
+        var op2 = allOptions.FirstOrDefault(o => o == tokens[^2]);
         //後ろから２つ目がオプションの場合
         if (op2 != null && wordToComplete != "")
         {
             //オプションに対する入力候補を取得
-            return GetCompletionItemByOptionName(cmd, op2, tokens, options, wordToComplete);
+            return GetCompletionItemByOptionName(cmd, op2, tokens, allOptions, wordToComplete);
         }
-        
-        return GetOptionNames(wordToComplete, options.Where(o=>!tokens.Contains(o)).ToArray());
+
+        return cmd.GetOptions(wordToComplete).Where(o => !tokens.Contains(o));
     }
 
     private static IEnumerable<string> GetCompletionItemByOptionName(
@@ -72,7 +63,7 @@ class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
             return GetOptionNames(wordToComplete, options.Where(o => !tokens.Contains(o)).ToArray());
         }
         //入力中の文字列でフィルタ
-        return item.Where(x => x.Contains(wordToComplete,StringComparison.InvariantCultureIgnoreCase));
+        return item.Where(x => x.Contains(wordToComplete, StringComparison.InvariantCultureIgnoreCase));
     }
 
     private static IEnumerable<string> GetOptionNames(string wordToComplete, string[] options)
@@ -88,9 +79,9 @@ class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
     {
         if (wordToComplete == "")
         {
-            return Items.Select(x => x.CommandName);
+            return _items.Select(x => x.CommandName);
         }
-        return Items.Where(x => x.CommandName.Contains(wordToComplete)).Select(x => x.CommandName);
+        return _items.Where(x => x.CommandName.Contains(wordToComplete)).Select(x => x.CommandName);
     }
 
     private static IEnumerable<string> Parse(string input, int position)

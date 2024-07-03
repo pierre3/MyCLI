@@ -6,10 +6,15 @@ class CommandCompletionItem(string commandName) : ICommandCompletionItem, IEnume
 
     public string CommandName { get; } = commandName;
 
-    public IEnumerable<string> GetCompletionItems(string optionName, string _) => items[optionName];
+    public IEnumerable<string> GetAllOptions() => items.Keys;
 
-    public IEnumerable<string> GetOptions() => items.Keys;
+    public IEnumerable<string> GetOptions(string wordToComplete)
+        => items.Keys.Where(o => o.Contains(wordToComplete, StringComparison.InvariantCultureIgnoreCase));
 
+    public IEnumerable<string> GetCompletionItems(string optionName, string wordToComplete)
+        => items[optionName].Where(o => o.Contains(wordToComplete, StringComparison.InvariantCultureIgnoreCase));
+
+    
     public void Add(string key, IEnumerable<string> value) => items.Add(key, value);
 
     IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
