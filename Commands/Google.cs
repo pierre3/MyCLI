@@ -5,9 +5,9 @@ using System.Xml.Linq;
 partial class MyCommands
 {
     /// <summary>
-    /// 指定したクエリでgoogle検索します
+    /// Performs a Google search with the specified query.
     /// </summary>
-    /// <param name="query">-q,検索クエリ</param>
+    /// <param name="query">The search query.</param>
     [Command("google")]
     public void GoogleSearch(string query)
     {
@@ -23,11 +23,14 @@ partial class MyCommands
     }
 
     /// <summary>
-    /// 入力した文字列から、検索キーワードの候補を生成するCompletionItem
+    /// CompletionItem that generates search keyword candidates from the entered string.
     /// </summary>
     class GoogleCompletionItem : ICommandCompletionItem
     {
         private HttpClient _httpClient;
+
+        private static readonly IEnumerable<string> options = ["--query"];
+
         public GoogleCompletionItem(HttpClient httpClient)
         {
             _httpClient = httpClient;
@@ -37,7 +40,7 @@ partial class MyCommands
 
         public async Task<IEnumerable<string>> GetCompletionItemsAsync(string optionName, string wordToComplete)
         {
-            if (optionName != "-q" || wordToComplete=="") { return []; }
+            if (optionName != "-query" || wordToComplete=="") { return []; }
 
             var response = await _httpClient.GetAsync($"https://google.com/complete/search?q={System.Web.HttpUtility.UrlEncode(wordToComplete)}&output=toolbar");
             using var stream = await response.Content.ReadAsStreamAsync();
@@ -46,6 +49,9 @@ partial class MyCommands
                 .Select(element => $"\"{(element.Attribute("data")?.Value ?? "")}\"");
         }
 
-        public IEnumerable<string> GetOptions() => ["-q"];
+        public IEnumerable<string> GetAllOptions() => options;
+
+        public IEnumerable<string> GetOptions(string wordToComplete) 
+            => options.Where(o => o.Contains(wordToComplete, StringComparison.InvariantCultureIgnoreCase));
     }
 }

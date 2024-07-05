@@ -6,12 +6,19 @@ class CommandCompletionItem(string commandName) : ICommandCompletionItem, IEnume
 
     public string CommandName { get; } = commandName;
 
-    public Task<IEnumerable<string>> GetCompletionItemsAsync(string optionName, string _) => Task.FromResult(items[optionName]);
+    public IEnumerable<string> GetAllOptions() => items.Keys;
 
-    public IEnumerable<string> GetOptions() => items.Keys;
+    public IEnumerable<string> GetOptions(string wordToComplete)
+        => items.Keys.Where(o => o.Contains(wordToComplete, StringComparison.InvariantCultureIgnoreCase));
 
+    public Task<IEnumerable<string>> GetCompletionItemsAsync(string optionName, string wordToComplete)
+    {
+        var result = items[optionName].Where(o => o.Contains(wordToComplete, StringComparison.InvariantCultureIgnoreCase));
+        return Task.FromResult(result);
+    }
+        
+    
     public void Add(string key, IEnumerable<string> value) => items.Add(key, value);
 
     IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
-
 }

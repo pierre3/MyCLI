@@ -10,6 +10,7 @@ var app = ConsoleApp.Create();
 app.Add<MyCommands>();
 await app.RunAsync(args);
 
+
 partial class MyCommands
 {
     private readonly CommandCompletionProvider CompletionProvider;
@@ -44,13 +45,12 @@ partial class MyCommands
                     {"--filter", ["all","folders","files"]}
                 },
             ];
-
-
     }
+
     public async Task Complete(string wordToComplete, string input, int cursorPosition)
     {
         var items = await CompletionProvider
-            .GetCompletionItemsAsync(wordToComplete, input, cursorPosition);
+            .CompleteAsync(wordToComplete, input, cursorPosition);
         foreach (var item in items)
         {
             Console.WriteLine(item);

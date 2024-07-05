@@ -3,46 +3,36 @@
 /// <summary>
 /// Provides command completion functionality.
 /// </summary>
-class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
+class CommandCompletionProvider : ICommandCompletionProvider, IEnumerable
 {
-    /// <summary>
-    /// Gets the list of command completion items.
-    /// </summary>
-    public IList<ICommandCompletionItem> Items { get; } = [];
+    private readonly IList<ICommandCompletionItem> _items = [];
 
     /// <summary>
     /// Adds a command completion item to the list.
     /// </summary>
-    public void Add(ICommandCompletionItem item) => Items.Add(item);
+    /// <param name="item">The command completion item to add.</param>
+    public void Add(ICommandCompletionItem item) => _items.Add(item);
+
 
     /// <summary>
-    /// Returns an enumerator that iterates through the command completion items.
+    /// Completes the command based on the input and cursor position.
     /// </summary>
-    public IEnumerator<ICommandCompletionItem> GetEnumerator()
-    {
-        return Items.GetEnumerator();
-    }
-
-    /// <summary>
-    /// Returns an enumerator that iterates through the command completion items.
-    /// </summary>
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
-    /// <summary>
-    /// Asynchronously gets the completion items for a given word to complete.
-    /// </summary>
-    public async Task<IEnumerable<string>> GetCompletionItemsAsync(string wordToComplete, string input, int cursorPosition)
+    /// <param name="wordToComplete">The word to complete.</param>
+    /// <param name="input">The input string.</param>
+    /// <param name="cursorPosition">The cursor position in the input string.</param>
+    /// <returns>A list of possible completions for the command.</returns>
+    public async  Task<IEnumerable<string>> CompleteAsync(string wordToComplete, string input, int cursorPosition)
     {
         var tokens = Parse(input, cursorPosition).Skip(1).ToArray();
         return await GetCompletionItemsAsync(tokens, wordToComplete.Trim('"'));
     }
 
     /// <summary>
-    /// Asynchronously gets the completion items for a given word to complete.
+    /// Gets the completion items for the command.
     /// </summary>
+    /// <param name="tokens">The tokens from the input string.</param>
+    /// <param name="wordToComplete">The word to complete.</param>
+    /// <returns>A list of possible completions for the command.</returns>
     private async Task<IEnumerable<string>> GetCompletionItemsAsync(string[] tokens, string wordToComplete)
     {
         // No command input
@@ -51,82 +41,80 @@ class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
             return GetCommandNames("");
         }
         // The first element is the command name
-        var cmd = Items.FirstOrDefault(x => tokens[0] == x.CommandName);
+        var cmd = _items.FirstOrDefault(x => tokens[0] == x.CommandName);
         if (cmd == null)
         {
-            // If no command is entered or is being entered, display a list of command names
+            // If the command is not entered or is being entered, display a list of command names
             return GetCommandNames(wordToComplete);
         }
         // Get a list of options from the command being entered
-        var options = cmd.GetOptions().ToArray();
+        var allOptions = cmd.GetAllOptions().ToArray();
         if (tokens.Length == 1) // Only the command is specified
         {
-            return GetOptionNames(wordToComplete, options);
+            return cmd.GetOptions(wordToComplete);
         }
 
-        var op1 = options.FirstOrDefault(o => o == tokens[^1]);
+        var op1 = allOptions.FirstOrDefault(o => o == tokens[^1]);
         // The last input value matches the option
         if (op1 != null)
         {
             // Get input candidates for the option
-            return await GetCompletionItemByOptionName(cmd, op1, tokens, options, wordToComplete);
+            return await GetCompletionItemByOptionNameAsync(cmd, op1, tokens, allOptions, wordToComplete);
         }
 
-        var op2 = options.FirstOrDefault(o => o == tokens[^2]);
-        // If the second from the last is an option
+        var op2 = allOptions.FirstOrDefault(o => o == tokens[^2]);
+        // If the second from the end is an option
         if (op2 != null && wordToComplete != "")
         {
             // Get input candidates for the option
-            return await GetCompletionItemByOptionName(cmd, op2, tokens, options, wordToComplete);
+            return await GetCompletionItemByOptionNameAsync(cmd, op2, tokens, allOptions, wordToComplete);
         }
 
-        return GetOptionNames(wordToComplete, options.Where(o => !tokens.Contains(o)).ToArray());
+        return cmd.GetOptions(wordToComplete).Where(o => !tokens.Contains(o));
     }
 
     /// <summary>
-    /// Asynchronously gets the completion items by option name.
+    /// Gets the completion items for a specific option of a command.
     /// </summary>
-    private static async Task<IEnumerable<string>> GetCompletionItemByOptionName(
+    /// <param name="cmd">The command.</param>
+    /// <param name="optionName">The name of the option.</param>
+    /// <param name="tokens">The tokens from the input string.</param>
+    /// <param name="options">The options for the command.</param>
+    /// <param name="wordToComplete">The word to complete.</param>
+    /// <returns>A list of possible completions for the option.</returns>
+    private static async Task<IEnumerable<string>> GetCompletionItemByOptionNameAsync(
         ICommandCompletionItem cmd, string optionName, string[] tokens, string[] options, string wordToComplete)
     {
         // Get input candidates for the option
         var item = await cmd.GetCompletionItemsAsync(optionName, wordToComplete);
         if (!item.Any())
         {
-            // If there are no value candidates, suggest the option as a candidate
-            return GetOptionNames(wordToComplete, options.Where(o => !tokens.Contains(o)).ToArray());
+            // If there are no value candidates, use the option as a candidate
+            return cmd.GetOptions(wordToComplete).Where(o => !tokens.Contains(o));
         }
-        // Filter by the string being entered
-        return item.Where(x => x.Contains(wordToComplete, StringComparison.InvariantCultureIgnoreCase));
+        return item;
     }
 
     /// <summary>
-    /// Gets the option names.
+    /// Gets the names of all commands.
     /// </summary>
-    private static IEnumerable<string> GetOptionNames(string wordToComplete, string[] options)
-    {
-        if (wordToComplete == "")
-        {
-            return options;
-        }
-        return options.Where(o => o.Contains(wordToComplete));
-    }
-
-    /// <summary>
-    /// Gets the command names.
-    /// </summary>
+    /// <param name="wordToComplete">The word to complete.</param>
+    /// <returns>A list of all command names.</returns>
     private IEnumerable<string> GetCommandNames(string wordToComplete)
     {
         if (wordToComplete == "")
         {
-            return Items.Select(x => x.CommandName);
+            return _items.Select(x => x.CommandName);
         }
-        return Items.Where(x => x.CommandName.Contains(wordToComplete)).Select(x => x.CommandName);
+        return _items.Where(x => x.CommandName.Contains(wordToComplete)).Select(x => x.CommandName);
     }
 
     /// <summary>
-    /// Parses the input into tokens.
+    /// Parses the input string into tokens.
     /// </summary>
+    /// <param name="input">The input string.</param>
+    /// <param name="position">The cursor position in the input string.</param>
+    /// <returns>A list of tokens from the input string.</returns>
     private static IEnumerable<string> Parse(string input, int position)
     {
         var source = input[0..Math.Min(input.Length, position)];
@@ -171,5 +159,11 @@ class CommandCompletionProvider : IEnumerable<ICommandCompletionItem>
             yield return token;
         }
     }
+
+    /// <summary>
+    /// Returns an enumerator that iterates through the command completion items.
+    /// </summary>
+    /// <returns>An enumerator for the command completion items.</returns>
+    IEnumerator IEnumerable.GetEnumerator() => _items.GetEnumerator();
 
 }
