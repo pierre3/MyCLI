@@ -2,9 +2,6 @@
 
 This is a sample that demonstrates how to add an auto-completion feature, which operates with PowerShell, to a CLI tool created with a .NET console application.
 
-
-## ƒTƒ“ƒvƒ‹‚ÌŽg‚¢•û
-
 ## Prerequisites
 
 This sample has been implemented and operationally verified in the following environment:
