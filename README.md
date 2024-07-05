@@ -6,7 +6,7 @@ This is a sample that demonstrates how to add an auto-completion feature, which 
 
 This sample has been implemented and operationally verified in the following environment:
 
-- - .NET 8.0
+- .NET 8.0
 - PowerShell v7.4.3
 
 ## Installation
