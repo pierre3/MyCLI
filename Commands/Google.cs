@@ -40,7 +40,7 @@ partial class MyCommands
 
         public async Task<IEnumerable<string>> GetCompletionItemsAsync(string optionName, string wordToComplete)
         {
-            if (optionName != "-query" || wordToComplete=="") { return []; }
+            if (optionName != "--query" || wordToComplete=="") { return []; }
 
             var response = await _httpClient.GetAsync($"https://google.com/complete/search?q={System.Web.HttpUtility.UrlEncode(wordToComplete)}&output=toolbar");
             using var stream = await response.Content.ReadAsStreamAsync();
