@@ -20,6 +20,7 @@ partial class MyCommands
         CompletionProvider =
             [
                 new GoogleCompletionItem(httpClient),
+                new CommandCompletionItem("bw-message"),
                 new CommandCompletionItem("search")
                 {
                     {"--category", ["books","movies","music"]},
