@@ -1,6 +1,10 @@
 # MyCLI
 
-This is a sample that demonstrates how to add an auto-completion feature, which operates with PowerShell, to a CLI tool created with a .NET console application.
+This repository is a sample of a CLI tool using [CySharp/ConsoleAppFramework](https://github.com/Cysharp/ConsoleAppFramework) and [CySharp/ProcessX](https://github.com/Cysharp/ProcessX). It includes the following samples:
+
+- Implementation of automatic completion of input parameters
+- Implementation of a filter to enable access to Bitwarden using [Bitwarden CLI](https://bitwarden.com/help/cli/)
+- Samples of switching desktops and pinning windows using the Powershell module [PSVirtualDesktop](https://github.com/MScholtes/PSVirtualDesktop)
 
 ![completion2](/img/completion2.gif)
 
