@@ -8,6 +8,7 @@ ConsoleApp.ServiceProvider = serviceProvider;
 
 var app = ConsoleApp.Create();
 app.Add<MyCommands>();
+
 await app.RunAsync(args);
 
 
@@ -20,6 +21,8 @@ partial class MyCommands
         CompletionProvider =
             [
                 new GoogleCompletionItem(httpClient),
+                new CommandCompletionItem("pin"),
+                new SwitchDesktopCompletionItem(),
                 new CommandCompletionItem("bw-message"),
                 new CommandCompletionItem("search")
                 {

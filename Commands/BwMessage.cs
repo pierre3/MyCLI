@@ -10,6 +10,7 @@ partial class MyCommands
     public async Task BwMessage()
     {
         Console.Write("メッセージ: ");
-        await $"bw get notes secure-memo";
+        var message = await $"bw get notes secure-memo";
+        Console.WriteLine(message);
     }
 }

@@ -2,7 +2,7 @@
   "profiles": {
     "MyCLI": {
       "commandName": "Project",
-      "commandLineArgs": "bw-message"
+      "commandLineArgs": "complete --word-to-complete \"\" --input \"mycli swdt --name\" --cursor-position 18"
     }
   }
 }

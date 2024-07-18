@@ -2,10 +2,12 @@
 using System.Text.RegularExpressions;
 using Zx;
 
-internal class BitwardenSessionFilter(ConsoleAppFilter next) : ConsoleAppFilter(next)
+internal partial class BitwardenSessionFilter(ConsoleAppFilter next) : ConsoleAppFilter(next)
 {
     public override async Task InvokeAsync(ConsoleAppContext context, CancellationToken cancellationToken)
     {
+        Env.verbose = false;
+
         T? DeserializeAnonimousType<T>(string value, T _) => System.Text.Json.JsonSerializer.Deserialize<T>(value);
 
         CopyEnvBwSession();
@@ -24,7 +26,6 @@ internal class BitwardenSessionFilter(ConsoleAppFilter next) : ConsoleAppFilter(
         Console.WriteLine("Ready! The Bitwarden session is active.");
         await Next.InvokeAsync(context, cancellationToken);
     }
-
 
     private static void CopyEnvBwSession()
     {
@@ -62,9 +63,12 @@ internal class BitwardenSessionFilter(ConsoleAppFilter next) : ConsoleAppFilter(
         SetEnvBwSession(session);
     }
 
+    [GeneratedRegex("BW_SESSION=\"(.*?)\"")]
+    private static partial Regex BwSessionRegiex();
+
     private static string GetBwSession(string ret)
     {
-        var match = Regex.Match(ret, "BW_SESSION=\"(.*?)\"");
+        var match = BwSessionRegiex().Match(ret);
         if (match.Success)
         {
             return match.Groups[1].Value;
@@ -93,4 +97,5 @@ internal class BitwardenSessionFilter(ConsoleAppFilter next) : ConsoleAppFilter(
         Console.WriteLine("");
         return password;
     }
+
 }
