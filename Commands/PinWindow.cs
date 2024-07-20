@@ -15,11 +15,11 @@ partial class MyCommands
             await $"Pin-Window {terminal.MainWindowHandle}";
             Console.WriteLine($"Pinned \"{terminal.MainWindowTitle}\".");
         }
-        var teams = Process.GetProcessesByName("ms-teams").FirstOrDefault();
-        if (teams != null)
+        var slack = Process.GetProcessesByName("slack").FirstOrDefault();
+        if (slack != null)
         {
-            await $"Pin-Window {teams.MainWindowHandle}";
-            Console.WriteLine($"Pinned \"{teams.MainWindowTitle}\".");
+            await $"Pin-Window {slack.MainWindowHandle}";
+            Console.WriteLine($"Pinned \"{slack.MainWindowTitle}\".");
         }
         var outlook = Process.GetProcessesByName("olk").FirstOrDefault();
         if (outlook != null)

@@ -1,9 +1,4 @@
 ﻿using ConsoleAppFramework;
-using Cysharp.Diagnostics;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
-using System.Xml.Linq;
 using Zx;
 
 

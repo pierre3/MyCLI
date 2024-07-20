@@ -15,15 +15,17 @@ await app.RunAsync(args);
 partial class MyCommands
 {
     private readonly CommandCompletionProvider CompletionProvider;
+    private readonly HttpClient _httpClient;
 
     public MyCommands(HttpClient httpClient)
     {
+        _httpClient = httpClient;
         CompletionProvider =
             [
                 new GoogleCompletionItem(httpClient),
                 new CommandCompletionItem("pin"),
                 new SwitchDesktopCompletionItem(),
-                new CommandCompletionItem("bw-message"),
+                new CommandCompletionItem("gh-issues"),
                 new CommandCompletionItem("search")
                 {
                     {"--category", ["books","movies","music"]},
